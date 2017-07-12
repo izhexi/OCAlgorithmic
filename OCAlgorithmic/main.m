@@ -7,21 +7,33 @@
 //
 
 #import <Foundation/Foundation.h>
-void selectionSort(NSArray *arr);
-void bubbleSort(NSArray *arr);
-void insertSort(NSArray *arr);
+
+extern void selectionSort(NSArray *arr);
+extern void bubbleSort(NSArray *arr);
+extern void insertSort(NSArray *arr);
+extern void shellSort(NSArray *arr);
+extern void quickSort(NSArray *arr);
+extern void quickSortIMP(NSInteger left,NSInteger right,NSArray *arr);
 
 int main(int argc, const char * argv[]) {
     @autoreleasepool {
-        NSArray *arr = @[@11,@21,@1,@9,@99,@32,@43,@10];
+        
+        NSMutableArray *arr = @[@11,@21,@1,@9,@99,@32,@43,@10].mutableCopy;
         selectionSort(arr);
         bubbleSort(arr);
         bubbleSort(@[@1,@2,@3,@4,@5,@6]);
         insertSort(arr);
+        shellSort(@[@0,@2,@4,@55,@25,@3,@97,@32,@1,@12,@1,@21,@14]);
+        quickSort(arr);
     }
     return 0;
 }
 
+/**
+ *  选择排序
+ *
+ *
+ */
 void selectionSort(NSArray *arr) {
     if (!arr.count || !arr) {
         return;
@@ -43,6 +55,11 @@ void selectionSort(NSArray *arr) {
     NSLog(@"selection sorted:%@",sortArray);
 }
 
+/**
+ *  冒泡排序
+ *
+ *  @param arr 需要排序的数组
+ */
 void bubbleSort(NSArray *arr) {
     NSMutableArray *sortArr = arr.mutableCopy;
     BOOL flag = NO;
@@ -64,6 +81,11 @@ void bubbleSort(NSArray *arr) {
     NSLog(@"bubble sorted: %@",sortArr);
 }
 
+/**
+ *  插入排序
+ *
+ *  @param arr  需要排序的数组
+ */
 void insertSort(NSArray *arr) {
     NSMutableArray *sortArr = arr.mutableCopy;
     for (NSInteger i = 0; i < sortArr.count -1; i ++) {
@@ -76,4 +98,70 @@ void insertSort(NSArray *arr) {
         }
     }
     NSLog(@"insert sorted: %@",sortArr);
+}
+
+/**
+ *  希尔排序
+ *
+ *  @param arr 需要传入的排序数组
+ */
+void shellSort(NSArray *arr) {
+    NSMutableArray *sortArr = arr.mutableCopy;
+    NSInteger increment = sortArr.count;
+    while (YES) {
+        increment = increment / 2;
+        for (NSInteger i = 0; i < increment; i ++) {
+            for (NSInteger j = i; j < sortArr.count; j += increment) {
+                for (NSInteger k = j + increment; k < sortArr.count; k += increment) {
+                    if ([sortArr[k] integerValue] <= [sortArr[k -increment] integerValue]) {
+                        NSInteger temp = [sortArr[k -increment] integerValue];
+                        sortArr[k -increment] = sortArr[k];
+                        sortArr[k] = @(temp);
+                    }
+                }
+            }
+        }
+        if (increment == 1) {
+            break;
+        }
+    }
+    NSLog(@"shell sorted :%@",sortArr);
+}
+
+
+void quickSort(NSArray *arr) {
+    NSInteger left = 0;
+    NSInteger right = arr.count - 1;
+    quickSortIMP(left, right, arr.mutableCopy);
+}
+
+void quickSortIMP(NSInteger left,NSInteger right,NSMutableArray *sortArr) {
+    if (left >= right) {
+        NSLog(@"qiuck sorted:%@",sortArr);
+        return;
+    }
+    NSInteger l,r;
+    l = left;
+    r = right;
+    NSInteger keyValue = [sortArr[l] integerValue];
+    
+    while (l < r) {
+        while (l < r && [sortArr[r] integerValue] >= keyValue) {
+            r --;
+        }
+        if (l < r) {
+            sortArr[l] = sortArr[r];
+            l ++;
+        }
+        while (l < r && [sortArr[l] integerValue] < keyValue) {
+            l ++;
+        }
+        if (l < r) {
+            sortArr[r] = sortArr[l];
+            r --;
+        }
+    }
+    sortArr[l] = @(keyValue);
+    quickSortIMP(left, l-1, sortArr);
+    quickSortIMP(l + 1, right, sortArr);
 }
